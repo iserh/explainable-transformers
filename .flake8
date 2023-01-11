@@ -1,0 +1,16 @@
+[flake8]
+# A:builtins, ANN:annotations, BLK:black, FS: fstring, I: isort, C90: max-complexity
+# E: pycodestyle(errors), F: pycodestyle, W: pyflakes(warnings)
+select = A,ANN,BLK,FS,I,C90,E,F,W
+ignore = """
+    ANN002 # Missing type annotation for args in method
+    ANN003 # Missing type annotation for kwargs in method
+    ANN101 # Missing type annotation for self in method
+    ANN102 # Missing type annotation for cls in method
+    ANN401 # Dynamically typed expressions (typing.Any) are disallowed
+    E203 # whitespace before ':'
+    E741 # Ambiguous variable name
+    """
+max-complexity = 11
+max-line-length= 120
+docstring-convention = google
