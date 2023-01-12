@@ -15,9 +15,6 @@ def prepare(dataset, model, tokenizer, output_file: h5py.File, split: str, batch
     # create dataloader for this dataset
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size)
 
-    labels = torch.nn.utils.rnn.pad_sequence(dataset.df["target_ind"].apply(torch.LongTensor), batch_first=True)
-    ds_label = output_file.create_dataset(f"{split}/label", data=labels)
-
     ds_embedding = output_file.create_dataset(
         f"{split}/embedding", (len(ds_label) * 512, 768), maxshape=(None, 768), dtype="e"
     )

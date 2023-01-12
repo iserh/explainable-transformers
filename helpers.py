@@ -110,7 +110,7 @@ class AmazonCat13K(torch.utils.data.Dataset):
             return text
 
 
-def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray) -> np.ndarray:
+def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray, padding: int | None = None, return_att_mask: bool = False) -> np.ndarray:
     """Restore the batched view of subsequent sequences.
     The returned view will be padded to the longest occuring sequence.
 
@@ -120,8 +120,10 @@ def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray) -> np.ndarray
         a (np.ndarray): Array containing sequences subsequently - shape (N, ...)
         batch_indices (np.ndarray): Array containing batch indices for each sequence element
     """
+    # ensure batch_indices are sequential from 0 to max
+    _, batch_indices = np.unique(batch_indices, return_inverse=True)
     # indices of the values in a
-    seq_indices = np.arange(len(index))
+    seq_indices = np.arange(len(batch_indices))
     # compute mask where the start of every sequence is 'True'
     seq_starts = np.concatenate([[True], (batch_indices[:-1] != batch_indices[1:])])
     # compute the sequence offsets 'x[seq_starts][index]' and subtract them from the sequence_indices
@@ -131,7 +133,10 @@ def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray) -> np.ndarray
     # batch size
     n = batch_indices.max() + 1
     # maximum sequence length
-    seq_len = seq_indices.max() + 1
+    if isinstance(padding, int):
+        seq_len = padding
+    else:
+        seq_len = seq_indices.max() + 1
 
     # the output array for the batched view
     out = np.zeros((n, seq_len, *a.shape[1:]))
@@ -139,4 +144,10 @@ def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray) -> np.ndarray
     out[batch_indices, seq_indices] = a
 
     # return batched view
-    return out
+    if return_att_mask:
+        attention_mask = np.zeros((n, seq_len))
+        attention_mask[batch_indices, seq_indices] = 1
+
+        return out, attention_mask
+    else:
+        return out
