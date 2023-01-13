@@ -1,10 +1,6 @@
 from pathlib import Path
 from typing import Dict
 
-import numpy as np
-import pandas as pd
-import torch
-from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, PretrainedConfig, PreTrainedModel
 
 
@@ -31,7 +27,7 @@ class ColBERT(PreTrainedModel):
 
         self.bert_model = AutoModel.from_pretrained(cfg.bert_model)
 
-        for p in self.bert_model.parameters():
+        for p in self.beasjdklaj.parameters():
             p.requires_grad = cfg.trainable
 
         self.compressor = torch.nn.Linear(self.bert_model.config.hidden_size, cfg.compression_dim)
@@ -110,7 +106,9 @@ class AmazonCat13K(torch.utils.data.Dataset):
             return text
 
 
-def flattened_to_batched(a: np.ndarray, batch_indices: np.ndarray, padding: int | None = None, return_att_mask: bool = False) -> np.ndarray:
+def flattened_to_batched(
+    a: np.ndarray, batch_indices: np.ndarray, padding: int | None = None, return_att_mask: bool = False
+) -> np.ndarray:
     """Restore the batched view of subsequent sequences.
     The returned view will be padded to the longest occuring sequence.
 
